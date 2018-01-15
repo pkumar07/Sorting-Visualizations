@@ -18,6 +18,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.poornimakumar.visualization.R;
 import com.poornimakumar.visualization.fragments.SortingFragment;
+import com.poornimakumar.visualization.utils.MergeSort;
 
 import java.util.Random;
 
@@ -37,18 +38,16 @@ public class SortingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sorting);
 
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//
-//        Fragment sortingFragment = new SortingFragment();
-//        fragmentTransaction.add(R.id.sorting_fragment,sortingFragment);
-//        fragmentTransaction.commit();
         graph = (GraphView) findViewById(R.id.sortingGraphView1);
         mSeries1 = new BarGraphSeries<>(generateData());
         graph.addSeries(mSeries1);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(20);
 
         SystemClock.sleep(2000);
-        new SortTask().execute(arrayToSort);
+
+        new MergeSort(graph,mSeries1,arrayToSort).execute();
+        //new SortTask("MERGE",arrayToSort).execute();
 //        GraphView graph2 = (GraphView) findViewById(R.id.sortingGraphView2);
 //        mSeries2 = new LineGraphSeries<>();
 //        graph2.addSeries(mSeries2);
@@ -119,22 +118,37 @@ public class SortingActivity extends AppCompatActivity {
                         arr[j+1] = temp;
                     }
         }
-    private class SortTask extends AsyncTask<DataPoint, DataPoint, String> {
+    private class SortTask extends AsyncTask<Void, DataPoint, String> {
+        private String code;
+        private DataPoint[] array;
+        public SortTask(String code, DataPoint[] array){
+            this.code = code;
+            this.array = array;
+        }
         @Override
-        protected String doInBackground(DataPoint... arrayToSort) {
-            for (int i = 0; i < arrayToSort.length-1; i++) {
-                for (int j = 0; j < arrayToSort.length - i - 1; j++) {
-                    if (arrayToSort[j].getY() > arrayToSort[j + 1].getY()) {
-                        Log.d("Sorting happening","swapping "+arrayToSort[j]+" with "+arrayToSort[j+1]);
-                        double temp = arrayToSort[j].getY();
-                        arrayToSort[j] = new DataPoint((double) j, arrayToSort[j + 1].getY());
-                        arrayToSort[j + 1] = new DataPoint((double) j + 1, temp);
-
+        protected String doInBackground(Void... params) {
+            switch(code){
+                case "BUBBLE" : {
+                    for (int i = 0; i < array.length-1; i++) {
+                        for (int j = 0; j < array.length - i - 1; j++) {
+                            if (array[j].getY() > array[j + 1].getY()) {
+                                Log.d("Sorting happening","swapping "+array[j]+" with "+array[j+1]);
+                                double temp = array[j].getY();
+                                array[j] = new DataPoint((double) j, array[j + 1].getY());
+                                array[j + 1] = new DataPoint((double) j + 1, temp);
+                            }
+                            publishProgress(array);
+                            SystemClock.sleep(1);
+                        }
                     }
-                    publishProgress(arrayToSort);
-                    SystemClock.sleep(1);
-                }
+                }break;
+
+                case "MERGE" :{
+
+                    //publishProgress(m.sort(array,0,array.length-1));
+                }break;
             }
+
             return null;
         }
 
