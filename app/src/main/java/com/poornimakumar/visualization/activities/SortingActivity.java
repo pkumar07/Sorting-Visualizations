@@ -21,6 +21,7 @@ import com.poornimakumar.visualization.fragments.SortingFragment;
 import com.poornimakumar.visualization.utils.InsertionSort;
 import com.poornimakumar.visualization.utils.MergeSort;
 import com.poornimakumar.visualization.utils.QuickSort;
+import com.poornimakumar.visualization.utils.SelectionSort;
 
 import java.util.Random;
 
@@ -48,7 +49,7 @@ public class SortingActivity extends AppCompatActivity {
 
         SystemClock.sleep(2000);
 
-        new InsertionSort(graph,mSeries1,arrayToSort).execute();
+        new SelectionSort(graph,mSeries1,arrayToSort).execute();
         //new SortTask("MERGE",arrayToSort).execute();
 //        GraphView graph2 = (GraphView) findViewById(R.id.sortingGraphView2);
 //        mSeries2 = new LineGraphSeries<>();
