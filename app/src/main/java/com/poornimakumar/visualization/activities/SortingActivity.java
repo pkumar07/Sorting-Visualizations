@@ -18,6 +18,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.poornimakumar.visualization.R;
 import com.poornimakumar.visualization.fragments.SortingFragment;
+import com.poornimakumar.visualization.utils.HeapSort;
 import com.poornimakumar.visualization.utils.InsertionSort;
 import com.poornimakumar.visualization.utils.MergeSort;
 import com.poornimakumar.visualization.utils.QuickSort;
@@ -49,7 +50,7 @@ public class SortingActivity extends AppCompatActivity {
 
         SystemClock.sleep(2000);
 
-        new SelectionSort(graph,mSeries1,arrayToSort).execute();
+        new HeapSort(graph,mSeries1,arrayToSort).execute();
         //new SortTask("MERGE",arrayToSort).execute();
 //        GraphView graph2 = (GraphView) findViewById(R.id.sortingGraphView2);
 //        mSeries2 = new LineGraphSeries<>();
