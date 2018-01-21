@@ -1,8 +1,10 @@
 package com.poornimakumar.visualization.utils;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -17,11 +19,19 @@ public class MergeSort extends AsyncTask<Void, DataPoint, String>{
     GraphView graph;
     BarGraphSeries<DataPoint> mSeries1;
     DataPoint[] arr;
-    public MergeSort(GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr){
+    Context context;
+    private long startTime, endTime;
+    public MergeSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr){
         this.graph = graph;
         this.mSeries1 = mSeries1;
         this.arr = arr;
+        this.context = context;
 
+    }
+    @Override
+    protected void onPreExecute() {
+        //super.onPreExecute();
+        startTime = System.currentTimeMillis();
     }
     @Override
     protected String doInBackground(Void... voids) {
@@ -44,6 +54,9 @@ public class MergeSort extends AsyncTask<Void, DataPoint, String>{
     protected void onPostExecute(String s) {
         //super.onPostExecute(s);
         Log.d("Async task","Done updating UI changes");
+        endTime = System.currentTimeMillis();
+        long timeTaken = (endTime - startTime)/1000;
+        Toast.makeText(context, "Time taken to sort: "+timeTaken+" secs", Toast.LENGTH_SHORT).show();
     }
 
     public DataPoint[] merge(DataPoint arr[], int left, int mid, int right) {

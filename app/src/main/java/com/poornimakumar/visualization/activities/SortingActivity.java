@@ -15,9 +15,7 @@ import android.util.Log;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 import com.poornimakumar.visualization.R;
-import com.poornimakumar.visualization.fragments.SortingFragment;
 import com.poornimakumar.visualization.utils.HeapSort;
 import com.poornimakumar.visualization.utils.InsertionSort;
 import com.poornimakumar.visualization.utils.MergeSort;
@@ -28,45 +26,58 @@ import java.util.Random;
 
 public class SortingActivity extends AppCompatActivity {
     //sorting variables
-
-    private Runnable mTimer1;
-    private Runnable mTimer2;
     private BarGraphSeries<DataPoint> mSeries1;
-    private LineGraphSeries<DataPoint> mSeries2;
-    private double graph2LastXValue = 5d;
-    private DataPoint[] arrayToSort;
+    private DataPoint[] arrayToSort, pausedArrayToSort;
     private GraphView graph;
+    private String type, algorithm;
+    private int range;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sorting);
 
+        //get intent data
+
+        Bundle extras = getIntent().getExtras();
+        if(extras!=null){
+            type = extras.getString("type");
+            range = extras.getInt("range");
+            algorithm = extras.getString("algorithm");
+        }
+
+        //initialise graphview
         graph = (GraphView) findViewById(R.id.sortingGraphView1);
-        mSeries1 = new BarGraphSeries<>(generateData());
+        mSeries1 = new BarGraphSeries<>(generateData(type, range));
         graph.addSeries(mSeries1);
         graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(20);
+        graph.getViewport().setMaxX(10);
 
+        //setting a sleep delay of 2 seconds before sorting visualization begins
         SystemClock.sleep(2000);
 
-        new HeapSort(graph,mSeries1,arrayToSort).execute();
-        //new SortTask("MERGE",arrayToSort).execute();
-//        GraphView graph2 = (GraphView) findViewById(R.id.sortingGraphView2);
-//        mSeries2 = new LineGraphSeries<>();
-//        graph2.addSeries(mSeries2);
+        //starting sort task , parameter passed is the DataPoint[] array (dataset) of the graph
+        startSortingTask(arrayToSort);
+
+
 //        graph2.getViewport().setXAxisBoundsManual(true);
 //        graph2.getViewport().setMinX(0);
 //        graph2.getViewport().setMaxX(40);
 
     }
-    private DataPoint[] generateData() {
-        int count = 30;
+    private DataPoint[] generateData(String type, int range) {
         //int r = new Random().nextInt(101);
-        DataPoint[] values = new DataPoint[count];
-        for (int i=0; i<count; i++) {
+        DataPoint[] values = new DataPoint[range];
+
+        for (int i=0; i<range; i++) {
             double x = i;
-            double y = new Random().nextInt() % 100;
+            double y=-1;
+            if(type.equals("Ascending"))
+                y = (new Random().nextInt(2)+i) % range;
+            else if(type.equals("Descending"))
+                y = (new Random().nextInt(2)+range-i) % range;
+            else
+                y = new Random().nextInt() % range;
             DataPoint v = new DataPoint(x, y);
             values[i] = v;
         }
@@ -74,31 +85,24 @@ public class SortingActivity extends AppCompatActivity {
         return values;
     }
 
+    private void startSortingTask(DataPoint[] arrayToSort){
+        if(algorithm.equals("Merge Sort"))
+            new MergeSort(this,graph,mSeries1,arrayToSort).execute();
+        else if(algorithm.equals("Heap Sort"))
+            new HeapSort(this,graph,mSeries1,arrayToSort).execute();
+        else if(algorithm.equals("Selection Sort"))
+            new SelectionSort(this,graph,mSeries1,arrayToSort).execute();
+        else if(algorithm.equals("Insertion Sort"))
+            new InsertionSort(this,graph,mSeries1,arrayToSort).execute();
+        else if(algorithm.equals("Quick Sort"))
+            new QuickSort(this,graph,mSeries1,arrayToSort).execute();
+    }
+
     @Override
     public void onResume() {
-        super.onResume();
-//        mTimer1 = new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.d("Array elements are: ","One by one: "+arrayToSort.toString());
-//                int n = arrayToSort.length;
-//                for(DataPoint d: arrayToSort)
-//                    Log.d("Array element: "," is: "+d);
-//                for (int i = 0; i < n-1; i++) {
-//                    for (int j = 0; j < n - i - 1; j++) {
-//                        if (arrayToSort[j].getY() > arrayToSort[j + 1].getY()) {
-//                            Log.d("Sorting happening","swapping "+arrayToSort[j]+" with "+arrayToSort[j+1]);
-//                            double temp = arrayToSort[j].getY();
-//                            arrayToSort[j] = new DataPoint((double) j, arrayToSort[j + 1].getY());
-//                            arrayToSort[j + 1] = new DataPoint((double) j + 1, temp);
-//                            //mHandler.sendEmptyMessage(0);
-//                            SystemClock.sleep(1000);
-//                        }
-//                    }
-//
-//                }
-//            }
-//        };
+          super.onResume();
+//        startSortingTask(pausedArrayToSort);
+
     }
 
 
@@ -106,7 +110,8 @@ public class SortingActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         //mHandler.removeCallbacks(mTimer2);
-        super.onPause();
+            super.onPause();
+//        pausedArrayToSort = arrayToSort;
     }
 
     private void bubbleSort(int[] arr){

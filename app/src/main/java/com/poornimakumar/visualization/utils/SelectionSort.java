@@ -4,9 +4,11 @@ package com.poornimakumar.visualization.utils;
  * Created by poornimakumar on 1/15/18.
  */
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -17,11 +19,20 @@ public class SelectionSort extends AsyncTask<Void, DataPoint, String> {
     GraphView graph;
     BarGraphSeries<DataPoint> mSeries1;
     DataPoint[] arr;
-    public SelectionSort(GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr){
+    Context context;
+    private long startTime, endTime;
+    public SelectionSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr){
         this.graph = graph;
         this.mSeries1 = mSeries1;
         this.arr = arr;
+        this.context = context;
     }
+    @Override
+    protected void onPreExecute() {
+        //super.onPreExecute();
+        startTime = System.currentTimeMillis();
+    }
+
     @Override
     protected String doInBackground(Void... voids) {
         sort(arr);
@@ -41,6 +52,9 @@ public class SelectionSort extends AsyncTask<Void, DataPoint, String> {
     protected void onPostExecute(String s) {
         //super.onPostExecute(s);
         Log.d("Async task","Done updating UI changes");
+        endTime = System.currentTimeMillis();
+        long timeTaken = (endTime - startTime)/1000;
+        Toast.makeText(context, "Time taken to sort: "+timeTaken+" secs", Toast.LENGTH_SHORT).show();
     }
 
     public void publish(DataPoint[] arr){
@@ -52,24 +66,17 @@ public class SelectionSort extends AsyncTask<Void, DataPoint, String> {
     {
         int n = arr.length;
 
-        // One by one move boundary of unsorted subarray
         for (int i = 0; i < n-1; i++)
         {
-            // Find the minimum element in unsorted array
-            int min_idx = i;
             for (int j = i+1; j < n; j++)
-                if (arr[j].getY() < arr[min_idx].getY())
-                    min_idx = j;
-
-            // Swap the found minimum element with the first
-            // element
-            SystemClock.sleep(1);
-            double temp = arr[min_idx].getY();
-            arr[min_idx] = new DataPoint(min_idx,arr[i].getY());
-            arr[i] = new DataPoint(i,temp);
-            publish(arr);
+                if (arr[j].getY() < arr[i].getY()) {
+                    SystemClock.sleep(1);
+                    double temp = arr[j].getY();
+                    arr[j] = new DataPoint(j, arr[i].getY());
+                    arr[i] = new DataPoint(i, temp);
+                    publish(arr);
+                }
         }
-        SystemClock.sleep(1);
     }
 }
 
