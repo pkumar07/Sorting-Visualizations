@@ -21,11 +21,13 @@ public class SelectionSort extends AsyncTask<Void, DataPoint, String> {
     DataPoint[] arr;
     Context context;
     private long startTime, endTime;
-    public SelectionSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr){
+    private int rate;
+    public SelectionSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr, int rate){
         this.graph = graph;
         this.mSeries1 = mSeries1;
         this.arr = arr;
         this.context = context;
+        this.rate = rate;
     }
     @Override
     protected void onPreExecute() {
@@ -35,7 +37,7 @@ public class SelectionSort extends AsyncTask<Void, DataPoint, String> {
 
     @Override
     protected String doInBackground(Void... voids) {
-        sort(arr);
+        sort(arr,rate);
         return null;
     }
 
@@ -62,7 +64,7 @@ public class SelectionSort extends AsyncTask<Void, DataPoint, String> {
         publishProgress(arr);
     }
 
-    void sort(DataPoint arr[])
+    void sort(DataPoint arr[],int rate)
     {
         int n = arr.length;
 
@@ -70,7 +72,7 @@ public class SelectionSort extends AsyncTask<Void, DataPoint, String> {
         {
             for (int j = i+1; j < n; j++)
                 if (arr[j].getY() < arr[i].getY()) {
-                    SystemClock.sleep(1);
+                    SystemClock.sleep(rate);
                     double temp = arr[j].getY();
                     arr[j] = new DataPoint(j, arr[i].getY());
                     arr[i] = new DataPoint(i, temp);
@@ -78,5 +80,6 @@ public class SelectionSort extends AsyncTask<Void, DataPoint, String> {
                 }
         }
     }
+
 }
 

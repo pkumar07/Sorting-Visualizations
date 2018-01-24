@@ -20,11 +20,13 @@ public class HeapSort extends AsyncTask<Void, DataPoint, String> {
     DataPoint[] arr;
     Context context;
     private long startTime, endTime;
-    public HeapSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr){
+    private int rate;
+    public HeapSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr, int rate){
         this.graph = graph;
         this.mSeries1 = mSeries1;
         this.arr = arr;
         this.context = context;
+        this.rate = rate;
     }
     @Override
     protected void onPreExecute() {
@@ -33,7 +35,7 @@ public class HeapSort extends AsyncTask<Void, DataPoint, String> {
     }
     @Override
     protected String doInBackground(Void... voids) {
-        sort(arr);
+        sort(arr,rate);
         return null;
     }
 
@@ -60,7 +62,7 @@ public class HeapSort extends AsyncTask<Void, DataPoint, String> {
         publishProgress(arr);
     }
 
-    void sort(DataPoint arr[])
+    void sort(DataPoint arr[], int rate)
     {
         int n = arr.length;
 
@@ -72,7 +74,7 @@ public class HeapSort extends AsyncTask<Void, DataPoint, String> {
         for (int i=n-1; i>=0; i--)
         {
             // Move current root to end
-            SystemClock.sleep(1);
+            SystemClock.sleep(rate);
             double temp = arr[0].getY();
             arr[0] = new DataPoint(0,arr[i].getY());
             arr[i] = new DataPoint(i,temp);
@@ -101,7 +103,7 @@ public class HeapSort extends AsyncTask<Void, DataPoint, String> {
         // If largest is not root
         if (largest != i)
         {
-            SystemClock.sleep(1);
+            SystemClock.sleep(rate);
             double swap = arr[i].getY();
             arr[i] = new DataPoint(i,arr[largest].getY());
             arr[largest] = new DataPoint(largest,swap);

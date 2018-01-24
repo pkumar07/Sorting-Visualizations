@@ -21,12 +21,13 @@ public class QuickSort extends AsyncTask<Void, DataPoint, String> {
     DataPoint[] arr;
     Context context;
     private long startTime, endTime;
-    public QuickSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr){
+    private int rate;
+    public QuickSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr,int rate){
         this.graph = graph;
         this.mSeries1 = mSeries1;
         this.arr = arr;
         this.context = context;
-
+        this.rate = rate;
     }
     @Override
     protected void onPreExecute() {
@@ -35,7 +36,7 @@ public class QuickSort extends AsyncTask<Void, DataPoint, String> {
     }
     @Override
     protected String doInBackground(Void... voids) {
-        sort(arr,0, arr.length-1);
+        sort(arr,0, arr.length-1, rate);
         return null;
     }
 
@@ -72,7 +73,7 @@ public class QuickSort extends AsyncTask<Void, DataPoint, String> {
             // equal to pivot
             if (arr[j].getY() <= pivot.getY())
             {
-                SystemClock.sleep(1);
+                SystemClock.sleep(rate);
                 i++;
                 // swap arr[i] and arr[j]
                 double temp = arr[i].getY();
@@ -83,7 +84,7 @@ public class QuickSort extends AsyncTask<Void, DataPoint, String> {
         }
 
         // swap arr[i+1] and arr[high] (or pivot)
-        SystemClock.sleep(1);
+        SystemClock.sleep(rate);
         double temp = arr[i+1].getY();
         arr[i+1] = new DataPoint(i+1,arr[high].getY());
         arr[high] = new DataPoint(high,temp);
@@ -96,7 +97,7 @@ public class QuickSort extends AsyncTask<Void, DataPoint, String> {
       arr[] --> Array to be sorted,
       low  --> Starting index,
       high  --> Ending index */
-    void sort(DataPoint arr[], int low, int high)
+    void sort(DataPoint arr[], int low, int high, int rate)
     {
         if (low < high)
         {
@@ -106,9 +107,9 @@ public class QuickSort extends AsyncTask<Void, DataPoint, String> {
 
             // Recursively sort elements before
             // partition and after partition
-            sort(arr, low, pi-1);
-            SystemClock.sleep(1);
-            sort(arr, pi+1, high);
+            sort(arr, low, pi-1,rate);
+            SystemClock.sleep(rate);
+            sort(arr, pi+1, high,rate);
         }
     }
 }

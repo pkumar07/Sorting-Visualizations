@@ -1,5 +1,6 @@
 package com.poornimakumar.visualization.activities;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +12,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -30,7 +32,7 @@ public class SortingActivity extends AppCompatActivity {
     private DataPoint[] arrayToSort, pausedArrayToSort;
     private GraphView graph;
     private String type, algorithm;
-    private int range;
+    private int range, rate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,7 @@ public class SortingActivity extends AppCompatActivity {
             type = extras.getString("type");
             range = extras.getInt("range");
             algorithm = extras.getString("algorithm");
+            rate = extras.getInt("rate");
         }
 
         //initialise graphview
@@ -55,14 +58,6 @@ public class SortingActivity extends AppCompatActivity {
 
         //setting a sleep delay of 2 seconds before sorting visualization begins
         SystemClock.sleep(2000);
-
-        //starting sort task , parameter passed is the DataPoint[] array (dataset) of the graph
-        startSortingTask(arrayToSort);
-
-
-//        graph2.getViewport().setXAxisBoundsManual(true);
-//        graph2.getViewport().setMinX(0);
-//        graph2.getViewport().setMaxX(40);
 
     }
     private DataPoint[] generateData(String type, int range) {
@@ -87,94 +82,32 @@ public class SortingActivity extends AppCompatActivity {
 
     private void startSortingTask(DataPoint[] arrayToSort){
         if(algorithm.equals("Merge Sort"))
-            new MergeSort(this,graph,mSeries1,arrayToSort).execute();
+            new MergeSort(this,graph,mSeries1,arrayToSort,rate).execute();
         else if(algorithm.equals("Heap Sort"))
-            new HeapSort(this,graph,mSeries1,arrayToSort).execute();
+            new HeapSort(this,graph,mSeries1,arrayToSort,rate).execute();
         else if(algorithm.equals("Selection Sort"))
-            new SelectionSort(this,graph,mSeries1,arrayToSort).execute();
+            new SelectionSort(this,graph,mSeries1,arrayToSort,rate).execute();
         else if(algorithm.equals("Insertion Sort"))
-            new InsertionSort(this,graph,mSeries1,arrayToSort).execute();
+            new InsertionSort(this,graph,mSeries1,arrayToSort,rate).execute();
         else if(algorithm.equals("Quick Sort"))
-            new QuickSort(this,graph,mSeries1,arrayToSort).execute();
+            new QuickSort(this,graph,mSeries1,arrayToSort,rate).execute();
     }
 
     @Override
     public void onResume() {
           super.onResume();
-//        startSortingTask(pausedArrayToSort);
+            pausedArrayToSort = arrayToSort;
+            startSortingTask(pausedArrayToSort);
 
     }
-
-
 
     @Override
     public void onPause() {
         //mHandler.removeCallbacks(mTimer2);
             super.onPause();
-//        pausedArrayToSort = arrayToSort;
+            pausedArrayToSort = arrayToSort;
     }
 
-    private void bubbleSort(int[] arr){
 
-            int n = arr.length;
-            for (int i = 0; i < n-1; i++)
-                for (int j = 0; j < n-i-1; j++)
-                    if (arr[j] > arr[j+1])
-                    {
-                        // swap temp and arr[i]
-                        int temp = arr[j];
-                        arr[j] = arr[j+1];
-                        arr[j+1] = temp;
-                    }
-        }
-    private class SortTask extends AsyncTask<Void, DataPoint, String> {
-        private String code;
-        private DataPoint[] array;
-        public SortTask(String code, DataPoint[] array){
-            this.code = code;
-            this.array = array;
-        }
-        @Override
-        protected String doInBackground(Void... params) {
-            switch(code){
-                case "BUBBLE" : {
-                    for (int i = 0; i < array.length-1; i++) {
-                        for (int j = 0; j < array.length - i - 1; j++) {
-                            if (array[j].getY() > array[j + 1].getY()) {
-                                Log.d("Sorting happening","swapping "+array[j]+" with "+array[j+1]);
-                                double temp = array[j].getY();
-                                array[j] = new DataPoint((double) j, array[j + 1].getY());
-                                array[j + 1] = new DataPoint((double) j + 1, temp);
-                            }
-                            publishProgress(array);
-                            SystemClock.sleep(1);
-                        }
-                    }
-                }break;
-
-                case "MERGE" :{
-
-                    //publishProgress(m.sort(array,0,array.length-1));
-                }break;
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            //super.onPostExecute(result);
-            Log.d("Async task","Done updating UI changes");
-        }
-
-        @Override
-        protected void onProgressUpdate(DataPoint... values) {
-            //super.onProgressUpdate(values);
-            Log.d("Handling class", "event update called");
-            graph.removeAllSeries();
-            mSeries1 = new BarGraphSeries<>(values);
-            graph.addSeries(mSeries1);
-        }
-    }
 
 }

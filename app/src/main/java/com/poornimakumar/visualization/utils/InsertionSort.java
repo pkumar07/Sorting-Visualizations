@@ -21,11 +21,13 @@ public class InsertionSort extends AsyncTask<Void, DataPoint, String> {
     DataPoint[] arr;
     Context context;
     private long startTime, endTime;
-    public InsertionSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr){
+    private int rate;
+    public InsertionSort(Context context,GraphView graph, BarGraphSeries<DataPoint> mSeries1, DataPoint[] arr,int rate){
         this.graph = graph;
         this.mSeries1 = mSeries1;
         this.arr = arr;
         this.context = context;
+        this.rate = rate;
 
     }
 
@@ -37,7 +39,7 @@ public class InsertionSort extends AsyncTask<Void, DataPoint, String> {
 
     @Override
     protected String doInBackground(Void... voids) {
-        sort(arr);
+        sort(arr,rate);
         return null;
     }
 
@@ -65,7 +67,7 @@ public class InsertionSort extends AsyncTask<Void, DataPoint, String> {
         publishProgress(arr);
     }
 
-    void sort(DataPoint[] arr)
+    void sort(DataPoint[] arr,int rate)
     {
         int n = arr.length;
         for (int i=1; i<n; ++i)
@@ -78,12 +80,12 @@ public class InsertionSort extends AsyncTask<Void, DataPoint, String> {
                of their current position */
             while (j>=0 && arr[j].getY() > key.getY())
             {
-                SystemClock.sleep(1);
+                SystemClock.sleep(rate);
                 arr[j+1] = new DataPoint(j,arr[j].getY());
                 publish(arr);
                 j = j-1;
             }
-            SystemClock.sleep(1);
+            SystemClock.sleep(rate);
             arr[j+1] = new DataPoint(j+1,key.getY());
             publish(arr);
         }

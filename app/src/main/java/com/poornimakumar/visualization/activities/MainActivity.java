@@ -1,6 +1,8 @@
 package com.poornimakumar.visualization.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatSpinner;
@@ -12,6 +14,9 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
 import com.poornimakumar.visualization.R;
 
 import java.util.ArrayList;
@@ -19,10 +24,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
-    private AppCompatSpinner mRangeSelector, mTypeOfRangeSelector, mSortSelector;
+    private AppCompatSpinner mRangeSelector, mTypeOfRangeSelector, mSortSelector, mRateSelector;
     private Button mBtn;
     private String type,algorithm;
-    private int range;
+    private int range, rate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mRangeSelector = (AppCompatSpinner)findViewById(R.id.rangeSelector);
         mTypeOfRangeSelector = (AppCompatSpinner)findViewById(R.id.typeSelector);
         mSortSelector = (AppCompatSpinner)findViewById(R.id.sortSelector);
+        mRateSelector = (AppCompatSpinner)findViewById(R.id.rateSelector);
         mBtn = (Button)findViewById(R.id.nextBtn);
 
 
@@ -48,10 +54,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ArrayAdapter<String> mSortAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, getTypeList(sortArray));
         mSortSelector.setAdapter(mSortAdapter);
 
+        String[] rateArray = new String[]{"1ms","2ms","3ms"};
+        ArrayAdapter<String> mRateAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, getTypeList(rateArray));
+        mRateSelector.setAdapter(mRateAdapter);
+
+
 //        setting spinner item selector listeners
         mRangeSelector.setOnItemSelectedListener(this);
         mTypeOfRangeSelector.setOnItemSelectedListener(this);
         mSortSelector.setOnItemSelectedListener(this);
+        mRateSelector.setOnItemSelectedListener(this);
 
 //        setting btn functionality
         mBtn.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     i.putExtra("type",type);
                     i.putExtra("range",range);
                     i.putExtra("algorithm", algorithm);
+                    i.putExtra("rate",rate);
                     startActivity(i);
                 }
                 else
@@ -82,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     break;
             case R.id.sortSelector: algorithm = String.valueOf(adapterView.getItemAtPosition(i));
                     break;
+            case R.id.rateSelector: rate = i+1;
+                    break;
         }
     }
 
@@ -90,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
            range = Integer.parseInt(adapterView.getItemAtPosition(0).toString());
             type= String.valueOf(adapterView.getItemAtPosition(0));
             algorithm = String.valueOf(adapterView.getItemAtPosition(0));
+            rate = 1;
 
     }
 
@@ -106,4 +122,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             typeList.add(s);
         return typeList;
     }
+
+
 }
